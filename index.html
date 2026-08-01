@@ -3,30 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lunch Break Selector — where do we eat today?</title>
+<title>Dove andiamo a pranzo?</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,800;1,9..144,600&family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#EAF0F7;
-    --ink:#0E1B36;
-    --ink-soft:#3B4A6B;
-    --coral:#E23B2E;
-    --coral-dark:#B62519;
-    --green:#1C8F55;
-    --gold:#E5A216;
-    --violet:#4B3CC4;
+    --bg:#F4F8FD;
+    --ink:#28374C;
+    --ink-soft:#6A778C;
+    --blue:#4C8FD6;
+    --blue-ink:#2C6BA6;
+    --blue-soft:#E9F2FC;
+    --coral:#EE6C4D;
+    --coral-dark:#C9512F;
+    --green:#2FA96A;
+    --gold:#D99B25;
+    --violet:#6C63D8;
     --card:#FFFFFF;
-    --line:rgba(14,27,54,0.14);
-    --shadow:rgba(14,27,54,0.24);
+    --line:rgba(40,55,76,0.12);
+    --shadow:rgba(40,55,76,0.18);
   }
   *{box-sizing:border-box;}
   body{
     margin:0;
     background:
-      radial-gradient(circle at 10% 6%, rgba(75,60,196,0.09), transparent 42%),
-      radial-gradient(circle at 92% 2%, rgba(226,59,46,0.09), transparent 40%),
-      radial-gradient(circle at 60% 96%, rgba(28,143,85,0.08), transparent 46%),
+      radial-gradient(circle at 12% 4%, rgba(76,143,214,0.10), transparent 46%),
+      radial-gradient(circle at 92% 2%, rgba(238,108,77,0.06), transparent 42%),
       var(--bg);
     color:var(--ink);
     font-family:'Space Grotesk',sans-serif;
@@ -35,45 +37,45 @@
   .wrap{max-width:1000px;margin:0 auto;}
 
   header{
-    background:var(--ink);color:#EAF0F7;border-radius:20px;padding:26px 28px 24px;
-    position:relative;overflow:hidden;
-    box-shadow:0 4px 0 -1px var(--coral), 0 20px 44px -24px var(--shadow);
+    background:linear-gradient(135deg, #EAF3FC 0%, #F7FBFF 55%, #FDF2EE 100%);
+    color:var(--ink);border-radius:22px;padding:26px 26px 24px;
+    position:relative;overflow:hidden;border:1px solid var(--line);
+    box-shadow:0 3px 0 -1px var(--blue), 0 18px 40px -28px var(--shadow);
   }
   header::after{content:"";position:absolute;inset:0;
-    background:repeating-linear-gradient(90deg, rgba(255,255,255,0.045) 0 2px, transparent 2px 28px);pointer-events:none;}
+    background:repeating-linear-gradient(90deg, rgba(76,143,214,0.045) 0 2px, transparent 2px 30px);pointer-events:none;}
   .brandline{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;
-    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
-    color:#9FC3FF;margin-bottom:14px;}
-  .ticker{color:#5FE0A0;}
-  h1{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(30px,5.4vw,52px);line-height:.98;margin:0 0 8px;letter-spacing:-.01em;}
-  h1 .a{color:var(--gold);}
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--blue-ink);margin-bottom:16px;}
+  .ticker{color:var(--ink-soft);}
+  h1{font-family:'Fraunces',serif;font-weight:800;font-size:clamp(30px,6vw,50px);line-height:1;margin:0 0 8px;letter-spacing:-.015em;color:var(--ink);}
   h1 .b{color:var(--coral);font-style:italic;}
-  .tag{font-size:14.5px;color:#DCE6FF;max-width:62ch;line-height:1.5;}
-  .tag b{color:var(--gold);}
-  .updated{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.05em;color:#9FC3FF;margin:10px 0 0;}
-  .updated b{color:#fff;}
-  .kpis{display:flex;gap:22px;flex-wrap:wrap;margin-top:16px;}
+  .tag{font-size:14.5px;color:var(--ink-soft);max-width:52ch;line-height:1.5;margin:0;}
+  .tag b{color:var(--blue-ink);}
+  .updated{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.05em;color:var(--ink-soft);margin:12px 0 0;}
+  .updated b{color:var(--blue-ink);}
+  .kpis{display:flex;gap:26px;flex-wrap:wrap;margin-top:18px;}
   .kpi{font-family:'IBM Plex Mono',monospace;}
-  .kpi b{display:block;font-size:22px;color:#fff;}
-  .kpi span{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#9FC3FF;}
+  .kpi b{display:block;font-size:22px;color:var(--blue-ink);}
+  .kpi span{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);}
 
   .searchbar{margin:22px 0 18px;position:relative;}
   .searchbar input{width:100%;font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:500;
-    padding:16px 18px 16px 50px;border:1.5px solid var(--ink);border-radius:12px;background:var(--card);color:var(--ink);
+    padding:16px 18px 16px 50px;border:1.5px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);
     box-shadow:0 6px 16px -10px var(--shadow);transition:box-shadow .15s, border-color .15s;}
-  .searchbar input:focus{outline:none;border-color:var(--coral);box-shadow:0 0 0 3px rgba(226,59,46,.12);}
+  .searchbar input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(76,143,214,.15);}
   .searchbar .mag{position:absolute;left:17px;top:50%;transform:translateY(-50%);font-size:20px;}
   .searchbar .clear{position:absolute;right:14px;top:50%;transform:translateY(-50%);border:none;background:var(--line);
     border-radius:50%;width:26px;height:26px;cursor:pointer;color:var(--ink);font-size:15px;display:none;line-height:1;}
 
   .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px 22px;box-shadow:0 10px 30px -18px var(--shadow);margin-bottom:18px;}
   .campo{margin-bottom:18px;}.campo:last-child{margin-bottom:0;}
-  .lab{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--coral-dark);margin-bottom:9px;display:flex;align-items:center;gap:7px;}
-  .lab .n{background:var(--ink);color:var(--bg);width:18px;height:18px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;}
+  .lab{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--blue-ink);margin-bottom:9px;display:flex;align-items:center;gap:7px;}
+  .lab .n{background:var(--blue);color:#fff;width:18px;height:18px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;}
   .pills{display:flex;flex-wrap:wrap;gap:8px;}
   .pill{font-family:'Space Grotesk',sans-serif;font-size:13.5px;font-weight:500;padding:8px 15px;border:1.5px solid var(--line);border-radius:30px;background:transparent;cursor:pointer;color:var(--ink);transition:all .13s;user-select:none;}
-  .pill:hover{border-color:var(--ink);}
-  .pill.on{background:var(--ink);color:var(--bg);border-color:var(--ink);}
+  .pill:hover{border-color:var(--blue);}
+  .pill.on{background:var(--blue);color:#fff;border-color:var(--blue);}
   .pill.on.g{background:var(--green);border-color:var(--green);}
   .pill.on.c{background:var(--coral);border-color:var(--coral);}
   .pill.on.gold{background:var(--gold);border-color:var(--gold);color:var(--ink);}
@@ -83,7 +85,7 @@
   .chip.on{background:var(--violet);border-color:var(--violet);color:#fff;}
   .toggles{display:flex;flex-wrap:wrap;gap:10px;}
   .toggle{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:500;padding:8px 14px;border:1.5px solid var(--line);border-radius:30px;cursor:pointer;user-select:none;transition:all .13s;}
-  .toggle:hover{border-color:var(--ink);}
+  .toggle:hover{border-color:var(--blue);}
   .toggle.on{background:var(--gold);border-color:var(--gold);color:var(--ink);}
   .toggle.on.newt{background:var(--violet);color:#fff;}
   .toggle.on.teamt{background:var(--violet);color:#fff;border-color:var(--violet);}
@@ -100,10 +102,10 @@
   .sortlab{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);display:flex;align-items:center;gap:7px;}
   .sortlab select{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:500;text-transform:none;letter-spacing:0;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:8px;padding:7px 10px;cursor:pointer;}
   .sortlab select:focus{outline:none;border-color:var(--violet);}
-  #resetBtn{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13.5px;background:transparent;color:var(--ink);border:1.5px solid var(--ink);padding:11px 18px;border-radius:10px;cursor:pointer;transition:all .12s;}
-  #resetBtn:hover{background:var(--ink);color:var(--bg);}
-  #slotBtn{font-family:'Fraunces',serif;font-weight:800;font-style:italic;font-size:17px;background:var(--coral);color:#fff;border:none;padding:13px 24px;border-radius:10px;cursor:pointer;box-shadow:0 8px 20px -8px rgba(226,59,46,.6);transition:transform .1s, box-shadow .1s;}
-  #slotBtn:hover{transform:translateY(-2px);box-shadow:0 12px 26px -10px rgba(226,59,46,.7);}
+  #resetBtn{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13.5px;background:transparent;color:var(--blue-ink);border:1.5px solid var(--blue-ink);padding:11px 18px;border-radius:10px;cursor:pointer;transition:all .12s;}
+  #resetBtn:hover{background:var(--blue);color:#fff;border-color:var(--blue);}
+  #slotBtn{font-family:'Fraunces',serif;font-weight:800;font-style:italic;font-size:17px;background:var(--coral);color:#fff;border:none;padding:13px 24px;border-radius:10px;cursor:pointer;box-shadow:0 8px 20px -8px rgba(238,108,77,.55);transition:transform .1s, box-shadow .1s;}
+  #slotBtn:hover{transform:translateY(-2px);box-shadow:0 12px 26px -10px rgba(238,108,77,.65);}
   #slotBtn:active{transform:translateY(1px);}
 
   .slot{display:none;background:var(--ink);border-radius:16px;padding:22px;margin-bottom:18px;text-align:center;box-shadow:0 10px 30px -14px var(--shadow);}
@@ -119,7 +121,7 @@
   @keyframes blur{0%{opacity:.55;transform:translateY(-2px);}100%{opacity:1;transform:translateY(2px);}}
   .slot-verdict{margin-top:14px;color:var(--bg);font-size:14px;min-height:20px;}
   .slot-verdict b{color:var(--gold);font-family:'Fraunces',serif;font-size:18px;}
-  .slot-again{margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:12px;background:transparent;border:1.5px solid #9FC3FF;color:#9FC3FF;border-radius:8px;padding:7px 14px;cursor:pointer;display:none;}
+  .slot-again{margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:12px;background:transparent;border:1.5px solid rgba(255,255,255,.45);color:rgba(255,255,255,.8);border-radius:8px;padding:7px 14px;cursor:pointer;display:none;}
 
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px;}
   .card{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:16px 16px 14px;position:relative;transition:transform .15s, box-shadow .15s, border-color .15s;display:flex;flex-direction:column;}
@@ -202,12 +204,12 @@
 
   <header>
     <div class="brandline">
-      <span>UniCredit · Piazza Gae Aulenti 3 · internal use only</span>
-      <span class="ticker">● COVERAGE: <span id="tickerNum">--</span> venues under review</span>
+      <span>🍽 Porta Nuova · Milano</span>
+      <span class="ticker">● <span id="tickerNum">--</span> spots on the radar</span>
     </div>
-    <h1><span class="a">Lunch Break</span> <span class="b">Selector</span></h1>
-    <p class="tag">The definitive answer to the eternal <b>"so… where do we go for lunch?"</b>. Set your preferences and get the best spots within a 15-minute walk of the office — ratings, reviews and all. Can't be bothered to choose? Let the Committee decide for you.</p>
-    <p class="updated">Register last updated: <b>1 Aug 2026</b> · next refresh: monthly</p>
+    <h1>Dove andiamo <span class="b">a pranzo?</span></h1>
+    <p class="tag">Find the spot that fits your lunch — filters, ratings and a shared team vote, all within a short walk. Can't decide? <b>Let the Committee pick.</b> 🎲</p>
+    <p class="updated">Updated <b>1 Aug 2026</b> · refreshed monthly</p>
     <div class="kpis">
       <div class="kpi"><b id="kpiTot">--</b><span>venues rated</span></div>
       <div class="kpi"><b id="kpiNew">--</b><span>new listings</span></div>
@@ -217,7 +219,7 @@
 
   <div class="searchbar">
     <span class="mag">🔍</span>
-    <input id="search" type="text" placeholder="Search the register: name, cuisine… (e.g. 'ramen', 'carbonara', 'poke')" autocomplete="off">
+    <input id="search" type="text" placeholder="Search a place or cuisine…" autocomplete="off">
     <button class="clear" id="clearSearch" aria-label="Clear">✕</button>
   </div>
 
