@@ -201,6 +201,29 @@
   footer{margin-top:30px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft);line-height:1.8;}
   footer .vlegend{display:inline-flex;align-items:center;gap:4px;vertical-align:middle;}
   @media (max-width:520px){.addgrid{grid-template-columns:1fr;}}
+/* --- Photo banner --- */
+.card-photo{position:relative;margin:-16px -16px 12px;height:120px;overflow:hidden;border-radius:12px 12px 0 0;background:var(--blue-soft);}
+.card-photo img{width:100%;height:100%;object-fit:cover;display:block;}
+.photo-attr{position:absolute;right:6px;bottom:5px;font-size:9px;line-height:1.2;color:#fff;background:rgba(0,0,0,.45);padding:1px 5px;border-radius:6px;max-width:70%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+/* --- Prenota (call) button --- */
+a.book{color:var(--green);font-weight:600;text-decoration:none;margin-left:10px;white-space:nowrap;}
+a.book:hover{text-decoration:underline;}
+/* --- Team notes --- */
+.notes{display:none;margin-top:8px;border-top:1px solid var(--line);padding-top:8px;}
+.notes.open{display:block;}
+.note{padding:6px 0;border-bottom:1px dashed var(--line);}
+.note:last-of-type{border-bottom:none;}
+.note-a{font-weight:700;color:var(--violet);font-size:12px;}
+.note-time{font-size:10px;color:var(--ink-soft);margin-left:6px;}
+.note-t{font-size:13px;color:var(--ink);margin-top:2px;white-space:pre-wrap;word-break:break-word;}
+.note-empty{font-size:12px;color:var(--ink-soft);padding:4px 0;}
+.note-form{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+.note-form input{border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-size:12px;font-family:inherit;background:var(--card);color:var(--ink);}
+.note-name{flex:0 0 88px;}
+.note-text{flex:1 1 140px;min-width:120px;}
+.note-post{background:var(--violet);color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;}
+.note-post:hover{filter:brightness(1.08);}
+.note-post:disabled{opacity:.5;cursor:default;}
 </style>
 </head>
 <body>
@@ -401,6 +424,8 @@ LOCALI.forEach(l=> l.walk = walkMin(l.lat,l.lng));
 
 let colleghi = [];
 let teamRatings = {};   // shared across colleagues: { id: {sum,count} }
+let teamComments = {}; // shared: { id: [ {a:author, t:text, ts:epoch} ] }
+let lastCommentAuthor = '';
 let myVotes = {};       // this session's votes: { id: n }
 let wishlist = [];      // shared "to try" list: [ id ]
 function tutti(){ return LOCALI.concat(colleghi).filter(l=> l.walk<=curLoc.maxWalk); }
@@ -517,6 +542,10 @@ function rateClass(r){ return r>=4.5?'':r>=4.0?'mid':'low'; }
 let winner=null;
 function card(l){
   const d=document.createElement('div'); d.className='card'+(l===winner?' win':'');
+  const cid=venueId(l);
+  const nComments=(Array.isArray(teamComments[cid])?teamComments[cid].length:0);
+  const photo=l.foto?`<div class="card-photo"><img src="${cEsc(l.foto)}" alt="" loading="lazy" onerror="this.closest('.card-photo').style.display='none'">${l.fotoAttr?`<span class="photo-attr">© ${cEsc(l.fotoAttr)}</span>`:''}</div>`:'';
+  const bookBtn=l.telefono?`<a class="book" href="tel:${cEsc(String(l.telefono).replace(/[^+0-9]/g,''))}" title="Call ${cEsc(l.nome)}">📞 Prenota</a>`:'';
   const mapsUrl=l.placeId?('https://www.google.com/maps/place/?q=place_id:'+l.placeId):('https://www.google.com/maps/search/'+encodeURIComponent(l.nome+' '+(l.indirizzo||'Milano')));
   const vent=l.bollino?`<span class="venturini"><svg width="15" height="15" viewBox="0 0 24 24"><path d="M2 21h3V10H2v11zM22 11a2 2 0 0 0-2-2h-5.3l.9-4.3a1.5 1.5 0 0 0-.44-1.36L14.2 2 8.6 7.6c-.37.37-.6.88-.6 1.4V19a2 2 0 0 0 2 2h8a2 2 0 0 0 1.84-1.2l2.02-4.7c.06-.16.1-.33.1-.5V11z" fill="#0E1B36"/></svg><span>MV ✓</span></span>`:'';
   const nb=l.nuovo?`<span class="newbadge">✦ new</span>`:'';
@@ -526,6 +555,7 @@ function card(l){
     ? l.recensioni.map(r=>`<div class="review">${r}</div>`).join('')+`<div class="rev-src">${l.segnalato?'— internal listing':'— summary of public reviews'}</div>`
     : `<div class="review">No review on file.</div>`;
   d.innerHTML=`
+    ${photo}
     <div class="card-top">
       <h3 class="card-nome">${l.nome}</h3>
       <div class="badges">${nb}${vent}</div>
@@ -542,11 +572,13 @@ function card(l){
     <div class="card-foot">
       <span class="walk">🚶 ${l.walk} min</span>
       <div class="foot-links">
-        <button class="rev-toggle">Reviews</button>
-        <a class="maps" href="${mapsUrl}" target="_blank" rel="noopener">Maps ↗</a>
+        <button class="rev-toggle">Tripadvisor reviews</button>
+        <button class="rev-toggle notes-toggle">💬 Team Notes${nComments?` (${nComments})`:''}</button>
+        <a class="maps" href="${mapsUrl}" target="_blank" rel="noopener">Maps ↗</a>${bookBtn}
       </div>
     </div>
     <div class="reviews">${revs}</div>
+    <div class="notes" data-notes></div>
     ${l.segnalato?'<div class="colleague">✎ flagged by a colleague</div>':''}
   `;
   d.querySelector('.rev-toggle').addEventListener('click',()=>{ d.querySelector('.reviews').classList.toggle('open'); });
@@ -569,6 +601,31 @@ function card(l){
     wishEl.querySelector('.wishbtn').addEventListener('click',()=>{ toggleWish(tid); renderWish(); if(stato.wishOnly) render(); });
   }
   renderWish();
+  const notesEl=d.querySelector('[data-notes]'), notesBtn=d.querySelector('.notes-toggle');
+  function renderNotes(){
+    const list=(Array.isArray(teamComments[cid])?teamComments[cid]:[]).slice().sort((x,y)=>y.ts-x.ts);
+    const items=list.length
+      ? list.map(c=>`<div class="note"><span class="note-a">${cEsc(c.a)}</span><span class="note-time">${relTime(c.ts)}</span><div class="note-t">${cEsc(c.t)}</div></div>`).join('')
+      : `<div class="note-empty">No notes yet — be the first.</div>`;
+    notesEl.innerHTML=`<div class="note-list">${items}</div>
+      <div class="note-form">
+        <input class="note-name" maxlength="40" placeholder="Your name" value="${cEsc(lastCommentAuthor)}">
+        <input class="note-text" maxlength="280" placeholder="Add a quick note…">
+        <button class="note-post">Post</button>
+      </div>`;
+    const nameI=notesEl.querySelector('.note-name'), textI=notesEl.querySelector('.note-text'), postB=notesEl.querySelector('.note-post');
+    async function submit(){
+      postB.disabled=true;
+      const ok=await postComment(cid, nameI.value, textI.value);
+      postB.disabled=false;
+      if(ok){ textI.value=''; renderNotes(); notesEl.classList.add('open');
+        const n=teamComments[cid].length; notesBtn.textContent=`💬 Team Notes (${n})`; }
+    }
+    postB.addEventListener('click', submit);
+    textI.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); submit(); } });
+  }
+  renderNotes();
+  notesBtn.addEventListener('click',()=>{ notesEl.classList.toggle('open'); });
   return d;
 }
 function venueId(l){ return l.placeId ? 'pid:'+l.placeId : 'name:'+l.nome; }
@@ -593,6 +650,7 @@ async function cloudLoad(){
       teamRatings = (o.teamRatings && typeof o.teamRatings==='object') ? o.teamRatings : {};
       colleghi = Array.isArray(o.colleghi) ? o.colleghi : [];
       wishlist = Array.isArray(o.wishlist) ? o.wishlist : [];
+      teamComments = (o.teamComments && typeof o.teamComments==='object') ? o.teamComments : {};
       colleghi.forEach(l=> l.walk = l.walk || walkMin(l.lat,l.lng));
     }
     tutti().forEach(l=> MACROS[l.macro]=l.macroLabel);
@@ -603,7 +661,7 @@ async function cloudLoad(){
 async function cloudSave(){
   if(!SYNC_URL) return false;
   cloudSaving=true;
-  try{ await fetch(SYNC_URL,{method:'POST',body:JSON.stringify({teamRatings,colleghi,wishlist})}); }catch(e){}
+  try{ await fetch(SYNC_URL,{method:'POST',body:JSON.stringify({teamRatings,colleghi,wishlist,teamComments})}); }catch(e){}
   cloudSaving=false; return true;
 }
 
@@ -615,14 +673,35 @@ async function voteTeam(id,n){
   if(SYNC_URL){ await cloudSave(); }
   else { try{ await window.storage.set('lbs-team-ratings', JSON.stringify(teamRatings), true); }catch(e){} }
 }
+/* ---- Team rating: Bayesian (IMDb-style) ranking ---- */
+let _teamC=0;
+const BAYES_M=3; // credibility weight: min votes before a score is fully "trusted"
+function refreshTeamC(){ let s=0,c=0; for(const k in teamRatings){ const r=teamRatings[k]; if(r&&r.count){ s+=r.sum; c+=r.count; } } _teamC = c? s/c : 0; }
+function teamCount(l){ const r=teamRatings[venueId(l)]; return r&&r.count? r.count : 0; }
+function teamBayes(l){ const r=teamRatings[venueId(l)]; if(!r||!r.count) return -1; const v=r.count, R=r.sum/v; return (v/(v+BAYES_M))*R + (BAYES_M/(v+BAYES_M))*_teamC; }
+
+/* ---- Team comments (shared) ---- */
+function cEsc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function relTime(ts){ const s=(Date.now()-ts)/1000; if(s<60)return 'now'; if(s<3600)return Math.floor(s/60)+'m'; if(s<86400)return Math.floor(s/3600)+'h'; return Math.floor(s/86400)+'d'; }
+async function postComment(id, author, text){
+  text=(text||'').trim(); if(!text) return false;
+  author=(author||'').trim().slice(0,40) || 'Anonimo';
+  lastCommentAuthor=author;
+  if(!Array.isArray(teamComments[id])) teamComments[id]=[];
+  teamComments[id].push({a:author, t:text.slice(0,280), ts:Date.now()});
+  if(SYNC_URL){ await cloudSave(); }
+  else { try{ await window.storage.set('lbs-team-comments', JSON.stringify(teamComments), true); }catch(e){} }
+  return true;
+}
+
 const SORTERS={
   rating:(a,b)=> (b.rating||0)-(a.rating||0),
-  team:(a,b)=> (teamAvg(b)-teamAvg(a)) || ((b.rating||0)-(a.rating||0)),
+  team:(a,b)=> (teamBayes(b)-teamBayes(a)) || (teamCount(b)-teamCount(a)) || ((b.rating||0)-(a.rating||0)),
   walk:(a,b)=> (a.walk-b.walk) || ((b.rating||0)-(a.rating||0)),
   price:(a,b)=> (a.prezzo-b.prezzo) || ((b.rating||0)-(a.rating||0)),
   name:(a,b)=> a.nome.localeCompare(b.nome)
 };
-function currentResults(){ return tutti().filter(pass).sort(SORTERS[stato.sort]||SORTERS.rating); }
+function currentResults(){ refreshTeamC(); return tutti().filter(pass).sort(SORTERS[stato.sort]||SORTERS.rating); }
 document.getElementById('sortBy').addEventListener('change',function(){ stato.sort=this.value; render(); });
 function render(){
   const grid=document.getElementById('grid'); grid.innerHTML='';
@@ -669,6 +748,8 @@ slotAgain.addEventListener('click',spin);
 async function loadTeam(){
   try{ const r=await window.storage.get('lbs-team-ratings', true); teamRatings = r&&r.value? JSON.parse(r.value):{}; }
   catch(e){ teamRatings={}; }
+  try{ const rc=await window.storage.get('lbs-team-comments', true); teamComments = rc&&rc.value? JSON.parse(rc.value):{}; }
+  catch(e){ teamComments={}; }
   render();
 }
 async function loadWish(){
